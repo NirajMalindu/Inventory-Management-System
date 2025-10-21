@@ -72,17 +72,39 @@
         .register-link a:hover {
             text-decoration: underline;
         }
+
+        #loading{
+            text-align: center;
+            display:none;
+            margin-top: 15%;
+            color: #fff;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid hsla(211, 100%, 50%, 1.00);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
+    <div class="login-container" id = "login">
+        <h2 id= "h2">Login</h2>
 
         @if(session('status'))
             <p class="error">{{ session('status') }}</p>
         @endif
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" id="loginForm">
             @csrf
 
             <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required autofocus>
@@ -95,12 +117,33 @@
                 <div class="error">{{ $message }}</div> 
             @enderror
 
-            <button type="submit">Login</button>
+            <button type="submit" id = "">Login</button>
         </form>
 
         <p class="register-link">
             Don’t have an account? <a href="{{ route('register') }}">Register</a>
         </p>
+
     </div>
+
+    
+        <!--loading indicators-->
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Loading Please wait...⏳</p>
+        </div>
+
+        <script>
+            const form = document.getElementById('loginForm');
+            const loading = document.getElementById('loading');
+            const login = document.getElementById('login');
+
+            form.addEventListener('submit', ()=>{
+                form.style.display = 'none';
+                loading.style.display = 'block';
+                login.style.display = 'none';
+            });
+
+        </script>
 </body>
 </html>

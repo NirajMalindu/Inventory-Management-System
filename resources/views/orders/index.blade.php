@@ -74,11 +74,57 @@
             font-size: 0.9rem;
         }
     }
+
+    .alert-success{
+        color: green;
+        margin-bottom: 20px;
+        font-size:28px;
+        text-align: center;
+        
+
+    }
+    .alert-danger{
+        color:red;
+        margin-bottom: 20px;
+        font-size:28px;
+        text-align: center;
+    }
+
+    /*back btn*/
+     .btn-home {
+        background: #28a745;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 10px 18px;
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
+    .btn-home:hover {
+        background: #1e7e34;
+    }
+
 </style>
 </head>
 <body>
 
+<!--back btn-->
+<a href="{{ route('dashboard') }}" class="btn-home">🏠 Home</a>
 <h1>Orders</h1>
+
+<!-- if session success it show a message-->
+    @if(session('success'))
+        <div class="alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- if session success it show a error message-->
+    @if(session('error'))
+        <div class="alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
 <table>
     <thead>

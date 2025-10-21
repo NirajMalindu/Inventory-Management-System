@@ -88,13 +88,50 @@
         margin-bottom: 20px;
         font-size:28px;
     }
+
+    #loading{
+        text-align: center;
+        display:none;
+        margin-top: 20%;
+    }
+    .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #007bff;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        animation: spin 2s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /*back btn*/
+     .btn-home {
+        background: #28a745;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 10px 18px;
+        text-decoration: none;
+        transition: background 0.3s ease;
+    }
+    .btn-home:hover {
+        background: #1e7e34;
+    }
+
 </style>
 </head>
 <body>
+    
+<!--back btn-->
+<a href="{{ route('dashboard') }}" class="btn-home">🏠 Home</a>
+<h1 id="h1">Place Order</h1>
 
-<h1>Place Order</h1>
-
-<form action="{{ route('orders.store') }}" method="POST">
+<form id = "orderForm" action="{{ route('orders.store') }}" method="POST">
     @csrf
 
     <!-- if session success it show a message-->
@@ -112,12 +149,34 @@
     @endif
 
     @foreach($products as $product)
-        <label>{{ $product->name }} (Stock: {{ $product->stock_quantity }})</label><!--to show quantity of each product and product name-->
-        <input type="number" name="products[{{ $product->id }}]" value="0" min="0" max="{{ $product->stock_quantity }}"><!--validation for when user enter larger than quantity-->
+        <label>{{ $product->name }} (Stock: {{ $product->current_stock }})</label><!--to show quantity (sum(in)-sum(out)) of each product and product name-->
+        <input type="number" name="products[{{ $product->id }}]" value="0" min="0" max="{{ $product->current_stock }}"><!--validation for when user enter larger than quantity-->
     @endforeach
 
     <button type="submit">Place Order</button>
 </form>
+
+<!--loading indicators-->
+<div id="loading">
+    <div class="spinner"></div>
+    <p>please wait....⏳</p>
+</div>
+
+<script>
+
+    const form = document.getElementById('orderForm');
+    const loading = document.getElementById('loading');
+    const h1 = document.getElementById('h1');
+
+    form.addEventListener('submit', ()=>{
+        loading.style.display = 'block';//show loading indicator
+        form.style.display = 'none';//hide the form
+        h1.style.display = 'none';//hide place order h1
+    });
+
+</script>
+
+
 
 </body>
 </html>

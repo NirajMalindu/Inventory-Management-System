@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\StockLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;//provides access to the currently authenticated user
 
@@ -38,15 +39,22 @@ class OrderController extends Controller
 
         $total = 0;
         foreach($request->products as $productId=>$qty){
+            //when user enter the quantity (request) in order a product this check it is grater than 0
             if($qty>0){
                 $product = Product::findOrFail($productId);
 
-                if($product->stock_quantity < $qty) 
+                //check user requested qty is grater than than product stock(calculate from stockLedgers()->sum('in')-sum('out'))
+                if($product->current_stock < $qty) //($product->current_stock )to get stock dynamically
                     return back()->with('error',"Not enough stock for {$product->name}");
 
-                //deducts the ordered quantity from the product’s stock and saves the change
-                $product->stock_quantity -= $qty; 
-                $product->save();
+                //save values to stock_ledgers table
+                StockLedger::create([
+                    'product_id' => $product->id,
+                    'in' => 0,
+                    'out' => $qty,
+                    'type' =>'out',
+                    'reference_id' => $order->id,
+                ]);
 
                 $order->products()->attach($productId,['quantity'=>$qty]);
                 $total += $product->price * $qty;

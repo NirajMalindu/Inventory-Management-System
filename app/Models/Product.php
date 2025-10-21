@@ -22,4 +22,17 @@ class Product extends Model
                     ->withPivot('quantity')
                     ->withTimestamps();
     }
+
+    //one product has many stockLedgers
+    public function stockLedgers() 
+    {
+        return $this->hasMany(StockLedger::class);
+    }
+
+    // dynamic attribute for calculate the stock (creates a computed field named current_stock)
+    public function getCurrentStockAttribute() {
+        $in = $this->stockLedgers()->sum('in');
+        $out = $this->stockLedgers()->sum('out');
+        return $in - $out;
+    }
 }
