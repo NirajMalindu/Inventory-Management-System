@@ -36,7 +36,15 @@ class ProductController extends Controller
             'name' => 'required',
             'category_name' => 'required', 
             'price' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'descrip' => 'nullable',
+
         ]);
+
+         $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+        }
 
         // Check if category exists, if not, create it
         $category = Category::firstOrCreate([    //(firstOrCreate)Checks if a category with that name exists.
@@ -49,6 +57,8 @@ class ProductController extends Controller
             'name' => $request->name,
             'category_id' => $category->id,
             'price' => $request->price,
+            'description' => $request->descrip,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('products.create')->with('success', 'Product added successfully!');
@@ -56,12 +66,28 @@ class ProductController extends Controller
 
 
 
-    public function destroy(Product $product) {
-        $product->delete();
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
+    public function destroy($id){
+
+        $product = Product::find($id);
+
+        if (!$product) {
+            return back()->with('error', 'Product not found.');
+        }
+
+
+        if ($product->status === 'deactivated') {
+            return back()->with('error', 'Product already deactivated.');
+        }
+
+        $product->status = 'deactivated';
+        $product->save();
+
+        return back()->with('success', 'Product has been deactivated.');
     }
 
 
+
+    
 
     //to show the stock history clicking history button in product action field
     public function history($id, Request $request){

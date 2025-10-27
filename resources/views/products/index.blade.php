@@ -89,6 +89,44 @@
         background: #0056b3;
     }
 
+    .drop-down {
+        position: relative;
+        display: inline-block;
+        }
+
+    .drop-btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+    .drop-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+        border-radius: 6px;
+        z-index: 1;
+    }
+    .drop-content a {
+        color: black;
+        padding: 10px 14px;
+        text-decoration: none;
+        display: block;
+    }
+    .drop-down:hover .drop-content {
+        display: block;
+    }
+    .drop-content a:hover {
+        background-color: #f1f1f1;
+    }
+    .drop-down:hover button {
+        background-color: #3e8e41;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -204,11 +242,16 @@
             <input type="text" name="search" placeholder="Search by name or category" value="{{ request('search') }}">
             <button type="submit">Search</button>
         </form>
-            <!--it helps to Add product-->
-        <a href="{{ route('products.create') }}" class="btn-add" onclick="submitData()" >+ Add Product</a>
 
-        <!--this for product history-->
-        <a href="#" class="btn-his">History</a>
+
+        <div class="drop-down">
+            <button class="drop-btn">Add</button>
+            <div class="drop-content"  onclick="submitData()">
+                <a href="{{route('purchases.create')}}">Stock</a>
+                <a href="{{route('products.create')}}">Product</a>
+            </div>
+        </div>
+
     </div>
 
     <table id="historyLoading" >
@@ -218,6 +261,7 @@
                 <th>Category</th>
                 <th>Stock</th>
                 <th>Price</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -228,13 +272,26 @@
                 <td>{{ $product->category->name ?? 'N/A' }}</td>
                 <td>{{ $product->current_stock }}</td>
                 <td>{{ number_format($product->price, 2) }}</td>
+                <td>
+                    <span style="color: {{ $product->status == 'deactivated' ? 'red' : 'green' }}">
+                        {{ ucfirst($product->status) }}
+                    </span>
+                </td>
                 <td onclick="submitData()">
                     <a href="{{ route('products.edit', $product->id) }}" class="btn-edit">Edit</a>
-                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-delete">Delete</button>
-                    </form>
-                    
+
+                    @if($product->status !== 'deactivated')
+                        <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+
+                    @else
+                        <button disabled 
+                                style="background: #ccc; color: #666; border: none; padding: 6px 12px; border-radius: 6px;">
+                            Deactivated
+                        </button>
+                    @endif
                     <!--to show history page-->
                     <a href="{{ route('stock.history', $product->id) }}" class="btn-edit" >History</a>
 

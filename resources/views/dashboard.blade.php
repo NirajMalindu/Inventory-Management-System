@@ -105,12 +105,12 @@
     </header>
 
     <!-- navigation Buttons card ekak -->
-    <div class="container" onclick="submitData()" id = "navButtons">
-        <a href="{{ route('products.index') }}" class="card-btn">Products</a>
-        <a href="{{ route('products.create') }}" class="card-btn">Add Product</a>
-        <a href="{{ route('orders.index') }}" class="card-btn">Orders</a>
-        <a href="{{ route('orders.create') }}" class="card-btn">Place Order</a>
-        <a href="{{ route('report.create') }}" class="card-btn">Generate Report</a>
+    <div class="container"  id = "navButtons">
+        <a href="{{ route('products.index') }}" class="card-btn" onclick="submitData()">Products</a>
+        <a href="{{ route('products.create') }}" class="card-btn" onclick="submitData()">Add Product</a>
+        <a href="{{ route('orders.index') }}" class="card-btn" onclick="submitData()">Orders</a>
+        <a href="{{ route('orders.create') }}" class="card-btn" onclick="submitData()">Place Order</a>
+        <a href="{{ route('report.create') }}" class="card-btn" onclick="submitData()">Generate Report</a>
         <a href="{{ route('logout') }}" class="card-btn logout-btn"
            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             Logout

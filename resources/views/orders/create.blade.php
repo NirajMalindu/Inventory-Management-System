@@ -1,182 +1,371 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Place Order</title>
-<style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: #f4f6f8;
-        margin: 0;
-        padding: 20px;
-        color: #333;
-    }
+<html lang ="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    h1 {
-        text-align: center;
-        margin-top: 30px;
-        margin-bottom: 30px;
-    }
 
-    form {
-        background: #fff;
-        padding: 30px 25px;
-        border-radius: 12px;
-        max-width: 500px;
-        margin: auto;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-
-    label {
-        display: block;
-        margin-top: 15px;
-        font-weight: 600;
-        color: #555;
-    }
-
-    input[type="number"] {
-        width: 100%;
-        padding: 10px 12px;
-        margin-top: 5px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        transition: 0.3s;
-    }
-
-    input[type="number"]:focus {
-        border-color: #007bff;
-        outline: none;
-        box-shadow: 0 0 5px rgba(0,123,255,0.3);
-    }
-
-    button {
-        display: block;
-        width: 80%;
-        margin: 25px auto 0;
-        padding: 12px;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: transform 0.2s ease, background 0.3s ease;
-    }
-
-    button:hover {
-        background: #0056b3;
-        transform: translateY(-2px);
-    }
-
-    @media (max-width: 500px) {
-        form {
-            padding: 20px;
-        }
-    }
-
-    .alert-success{
-        color: green;
-        margin-bottom: 20px;
-        font-size:28px;
+        <title>Products</title>
         
 
-    }
-    .alert-danger{
-        color:red;
-        margin-bottom: 20px;
-        font-size:28px;
-    }
+        <style>
+            body{
+                font-family: 'Poppins', sans-serif;
+                background: #f5f7fa;
+                margin: 0;
+                padding: 20px;
+            }
+            h2{
+                text-align: center;
+            }
+            .session-succ{
+                color: green;
+                text-align: center;
+            }
+            .session-err{
+                color: red;
+                text-align: center;
+            }
+            .no-products{
+                text-align:center;
+                color:gray;
+                margin-top:30px;
+            }
 
-    #loading{
-        text-align: center;
-        display:none;
-        margin-top: 20%;
-    }
-    .spinner {
-        border: 6px solid #f3f3f3;
-        border-top: 6px solid #007bff;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        animation: spin 2s linear infinite;
-        margin: 0 auto;
-    }
+            .top-bar {
+                display: flex;
+                align-items: center;
+                margin-bottom: 25px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+             .search-box {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+            .search-box input[type="text"] {
+                padding: 10px 15px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                font-size: 1rem;
+                width: 250px;
+                transition: 0.2s;
+            }
 
-    /*back btn*/
-     .btn-home {
-        background: #28a745;
-        color: #fff;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 10px 18px;
-        text-decoration: none;
-        transition: background 0.3s ease;
-    }
-    .btn-home:hover {
-        background: #1e7e34;
-    }
+            .search-box input[type="text"]:focus {
+                outline: none;
+                border-color: #28a745;
+                box-shadow: 0 0 5px rgba(0,123,255,0.3);
+            }
 
-</style>
-</head>
-<body>
-    
-<!--back btn-->
-<a href="{{ route('dashboard') }}" class="btn-home">🏠 Home</a>
-<h1 id="h1">Place Order</h1>
+            .search-box button {
+                background: #28a745;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 18px;
+                cursor: pointer;
+                transition: 0.3s;
+                margin-right: 30px;
+            }
 
-<form id = "orderForm" action="{{ route('orders.store') }}" method="POST">
-    @csrf
+            .search-box button:hover {
+                background: #1e7e34;
+            }
 
-    <!-- if session success it show a message-->
-    @if(session('success'))
-        <div class="alert-success">
-            {{ session('success') }}
+            .card-container{
+                align-items: center;
+                display: flex;
+                   flex-wrap: wrap; 
+                margin-bottom: 30px;
+                gap: 20px;
+                
+            }
+            .card {
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                padding: 15px;
+                transition: transform 0.2s;
+                cursor: pointer;
+                width: 13%;
+                height: 260px; 
+                margin-top: 30px;
+   
+            }
+            .card:hover { 
+                transform: translateY(-5px); 
+            }
+            .card img {
+                width: 90%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 10px;
+            }
+
+            .card h3 { 
+                margin: 10px 0; 
+                color: #333; 
+            }
+
+            .price {
+                color: #27ae60;
+                font-weight: bold;
+            }
+
+            /* Form style */
+            .form-container {
+                display: none;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                padding: 20px;
+                max-width: 400px;
+                margin: 0 auto;
+                text-align: center;
+            }
+
+            .form-container img {
+                width: 80%;
+                height: 300px;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-bottom: 10px;
+            }
+
+            .qty-btn {
+                padding: 8px 12px;
+                background: #007bff;
+                border: none;
+                color: white;
+                border-radius: 6px;
+                font-size: 18px;
+                cursor: pointer;
+                margin: 0 8px;
+            }
+
+            #buyBtn {
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                margin-top: 10px;
+            }
+
+            .close-btn {
+                color: red;
+                cursor: pointer;
+                margin-top: 10px;
+                display: inline-block;
+            }
+
+            .descrip {
+                color: #555;
+                font-size: 14px;
+                margin: 8px 0;
+            }
+
+            .btn-home {
+                background: #28a745;
+                color: #fff;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 10px 18px;
+                text-decoration: none;
+                transition: background 0.3s ease;
+            }
+            .btn-home:hover {
+                background: #1e7e34;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h2>Place your order</h2>
+
+        <div class="top-bar" id="searchLoading">
+            <!--back btn-->
+            <a href="{{ route('dashboard') }}" class="btn-home" id= "btnHome">🏠 Home</a>
+
+            <form method= "GET" action="{{route('orders.create')}}" class = "search-box">
+                <input type="text" name="search" placeholder= "Search by Name or Category" value="{{ request('search') }}" id="">
+                <button type="submit">Search</button>
+            </form>
         </div>
-    @endif
+        <br><br>
 
-    <!-- if session success it show a error message-->
-    @if(session('error'))
-        <div class="alert-danger">
-            {{ session('error') }}
+        @if(session('success'))
+            <p class="session-succ">{{session('success')}}</p>
+        @endif
+
+        @if(session('error'))
+            <p class="session-err">{{session('error')}}</p>
+        @endif
+        
+
+        @if($products->isEmpty())
+        <p class= "no-products">
+            No products founded.
+        </p>
+        @else
+
+        <div class="card-container" id= "cardContain">
+            @foreach($products as $product)
+              <div class="card" 
+                    onclick="openForm(@js($product->id), @js($product->name), @js(asset('storage/'.$product->image)),
+                    @js($product->description), @js($product->price), @js($product->current_stock) )">
+
+
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{$product->name}}">
+                    <h3>Name: {{$product->name}}</h3>
+                    <div class="price">
+                        Rs. {{ number_format($product->price, 2) }}
+                    </div>
+                </div>
+            @endforeach
         </div>
-    @endif
+        @endif
 
-    @foreach($products as $product)
-        <label>{{ $product->name }} (Stock: {{ $product->current_stock }})</label><!--to show quantity (sum(in)-sum(out)) of each product and product name-->
-        <input type="number" name="products[{{ $product->id }}]" value="0" min="0" max="{{ $product->current_stock }}"><!--validation for when user enter larger than quantity-->
-    @endforeach
+        <!--hidden form-->
+        <div id= "productForm" class="form-container">
+            <p id="message" style="color:green; display:none; margin-top:10px; font-size:20px;"></p>
 
-    <button type="submit">Place Order</button>
-</form>
+            <img id= "formImg" src="" alt="">
+            <h3 id= "formName"></h3>
 
-<!--loading indicators-->
-<div id="loading">
-    <div class="spinner"></div>
-    <p>please wait....⏳</p>
-</div>
+            <input type="hidden" id= "productId">
+            <p id= "formDescrip"  class="descrip"></p>
+            <div id ="formPrice" class="price"></div>
+            <h3 id= "quantityValue"></h3>
+            
+            <div style= "margin:10px 0;">
+                <button type="button" class= "qty-btn" onclick= "changeQty(-1)">-</button>
+                <span id="quantityInput">1</span>
+                <button type="button" class= "qty-btn" onclick= "changeQty(1)">+</button>
+            </div>
 
-<script>
+            <button type="button" id= "buyBtn">Submit</button>
+            <div class="close-btn" onclick= "closeForm()"> Cancel</div>
 
-    const form = document.getElementById('orderForm');
-    const loading = document.getElementById('loading');
-    const h1 = document.getElementById('h1');
+           
 
-    form.addEventListener('submit', ()=>{
-        loading.style.display = 'block';//show loading indicator
-        form.style.display = 'none';//hide the form
-        h1.style.display = 'none';//hide place order h1
-    });
-
-</script>
+        </div>
 
 
 
-</body>
+        <script >
+
+            let quantity = 1;
+            let maxStock = 0;
+
+            function openForm(id, name, image, description, price, current_stock){
+
+                document.getElementById('formImg').src = image;
+                document.getElementById('formName').innerText = name;
+                document.getElementById('productId').value = id;
+                document.getElementById('formDescrip').innerText = description;
+                document.getElementById('formPrice').innerText =  'Rs. ' + price;
+
+                document.getElementById('quantityValue').innerText = current_stock + '   Available';
+                document.getElementById('quantityInput').innerText = 1;
+                quantity = 1;
+
+                maxStock = parseInt(current_stock);
+
+                document.getElementById('productForm').style.display = 'block';
+                document.getElementById('cardContain').style.display = 'none';
+                document.getElementById('searchLoading').style.display = 'none';
+
+
+            }
+
+
+            function closeForm() {
+                document.getElementById('productForm').style.display = 'none';
+                document.getElementById('cardContain').style.display = 'flex';
+                document.getElementById('searchLoading').style.display = 'flex';
+
+                window.location.href = "{{ route('orders.create') }}";
+
+
+            }
+
+
+            function changeQty(change){
+
+                let newQuantity = quantity + change;
+
+                if(newQuantity < 1){
+                    message.innerText = "Minimum quantity is 1.";
+                    message.style.color = 'red';
+                    message.style.display = 'block';
+                    
+                     setTimeout(() => {
+                                $('#message').fadeOut();
+                            }, 2000);
+                    return;
+                }
+
+                if(newQuantity > maxStock){
+                    message.innerText = "sorry, only " + maxStock + " stock available.";
+                    message.style.display = 'block';
+
+                     setTimeout(() => {
+                                $('#message').fadeOut();
+                            }, 2000);
+                    return;
+                }
+
+                quantity = newQuantity;
+                document.getElementById('quantityInput').innerText = quantity;
+            }
+
+
+            //ajax button, buy button
+            $('#buyBtn').on('click', function(){
+                
+                let productId = $('#productId').val();
+                let qty = $('#quantityInput').text();
+                let token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                    url: "{{ route('orders.store') }}",
+                    method: 'POST',
+                    data: {
+                        _token: token,
+                        product_id: productId,
+                        quantity: qty
+                    },
+
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#message').text(response.message).show();
+                            $('#quantityValue').text(response.updated_stock + '   Available')
+                            setTimeout(() => {
+                                $('#message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+
+                    error: function(xhr) {
+                         if (xhr.responseJSON && xhr.responseJSON.message) {
+                            $('#message').css('color', 'red').text(xhr.responseJSON.message).show();
+                        }else{
+                            alert('Something went wrong while buying!');
+                        }
+                    }
+                })
+            });
+
+            
+        </script>
+
+    </body>
 </html>

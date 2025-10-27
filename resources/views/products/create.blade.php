@@ -179,7 +179,7 @@
     <h1>Add Product</h1>
 
     <div class="card">
-        <form id="productForm" action="{{ route('products.store') }}" method="POST">
+        <form id="productForm" action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             @if(session('success'))
@@ -203,6 +203,8 @@
                 <option value="Books">Books</option>
             </select>
 
+            <input type="text" name="descrip" placeholder="Description ">
+            <input type="file" name="image" placeholder="Image ">
             <input type="number" step="0.01" name="price" placeholder="Price" min="0" required>
 
             <button type="submit">💾 Save Product</button>

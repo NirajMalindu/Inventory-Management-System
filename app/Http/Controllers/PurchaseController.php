@@ -13,10 +13,12 @@ class PurchaseController extends Controller
 {
     //shows the "purchases create" form in product adding (in a button)
     public function create() {
-        $products = Product::all();
+
+        $products = Product::where('status', 'active')->get();
         return view('purchases.create', compact('products'));
     }
 
+    
     //to store the qty for products in stockLedger
     public function store(Request $request){
         
